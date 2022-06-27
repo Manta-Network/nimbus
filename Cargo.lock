@@ -4894,6 +4894,7 @@ version = "0.9.0"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
+ "frame-support-test",
  "frame-system",
  "log",
  "nimbus-primitives",
