@@ -36,7 +36,7 @@ use sp_runtime::{
 
 /// The Nimbus verifier strips the seal digest, and checks that it is a valid signature by
 /// the same key that was injected into the runtime and noted in the Seal digest.
-/// From Nimbu's perspective any block that faithfully reports its authorship to the runtime
+/// From Nimbus' perspective any block that faithfully reports its authorship to the runtime
 /// is valid. The intention is that the runtime itself may then put further restrictions on
 /// the identity of the author.
 pub struct Verifier<Client, Block, CIDP> {
