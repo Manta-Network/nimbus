@@ -273,3 +273,28 @@ where
 		self.inner.import_block(block_import_params, cache).await
 	}
 }
+
+/// Parameters of [`build_verifier`].
+pub struct BuildVerifierParams<Client, Block, CIDP> {
+	/// The client to interact with the chain.
+	pub client: Arc<Client>,
+	/// Something that can create the inherent data providers.
+	pub create_inherent_data_providers: CIDP,
+	/// ????
+	pub _marker: PhantomData<Block>,
+}
+
+/// Build a [`NimbusVerifier`] ( allows for composing nimbus with other consensus engines )
+pub fn build_verifier<Client, Block, CIDP>(
+	BuildVerifierParams {
+		client,
+		create_inherent_data_providers,
+		_marker,
+	}: BuildVerifierParams<Client, Block, CIDP>,
+) ->  Verifier<Client, Block, CIDP> {
+	Verifier{
+		client,
+		create_inherent_data_providers,
+		_marker,
+	}
+}
