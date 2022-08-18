@@ -24,7 +24,6 @@ use cumulus_client_consensus_common::{
 	ParachainBlockImport, ParachainCandidate, ParachainConsensus,
 };
 use cumulus_primitives_core::{relay_chain::v2::Hash as PHash, ParaId, PersistedValidationData};
-pub use import_queue::import_queue;
 use log::{debug, info, warn};
 use nimbus_primitives::{
 	AuthorFilterAPI, CompatibleDigestItem, DigestsProvider, NimbusApi, NimbusId, NIMBUS_KEY_ID,
@@ -46,7 +45,7 @@ use std::convert::TryInto;
 use std::{marker::PhantomData, sync::Arc, time::Duration};
 use tracing::error;
 mod import_queue;
-pub use import_queue::{Verifier,NimbusBlockImport};
+pub use import_queue::{import_queue, build_verifier, BuildVerifierParams, Verifier, NimbusBlockImport};
 mod manual_seal;
 pub use manual_seal::NimbusManualSealConsensusDataProvider;
 
