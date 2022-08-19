@@ -45,6 +45,20 @@ pub struct Verifier<Client, Block, CIDP> {
 	_marker: PhantomData<Block>,
 }
 
+impl<Client, Block, CIDP> Verifier<Client, Block, CIDP> 
+{
+/// Build a [`NimbusVerifier`] ( allows for composing nimbus with other consensus engines )
+pub fn new(
+	client: Arc<Client>,
+	create_inherent_data_providers: CIDP,
+) ->  Self {
+	Self{
+		client,
+		create_inherent_data_providers,
+		_marker : PhantomData{},
+	}
+}
+}
 #[async_trait::async_trait]
 impl<Client, Block, CIDP> VerifierT<Block> for Verifier<Client, Block, CIDP>
 where
@@ -201,11 +215,10 @@ where
 	<Client as ProvideRuntimeApi<Block>>::Api: BlockBuilderApi<Block>,
 	CIDP: CreateInherentDataProviders<Block, ()> + 'static,
 {
-	let verifier = Verifier {
+	let verifier = Verifier::new(
 		client,
 		create_inherent_data_providers,
-		_marker: PhantomData,
-	};
+);
 
 	Ok(BasicQueue::new(
 		verifier,
@@ -271,30 +284,5 @@ where
 
 		// Now continue on to the rest of the import pipeline.
 		self.inner.import_block(block_import_params, cache).await
-	}
-}
-
-/// Parameters of [`build_verifier`].
-pub struct BuildVerifierParams<Client, Block, CIDP> {
-	/// The client to interact with the chain.
-	pub client: Arc<Client>,
-	/// Something that can create the inherent data providers.
-	pub create_inherent_data_providers: CIDP,
-	/// ????
-	pub _marker: PhantomData<Block>,
-}
-
-/// Build a [`NimbusVerifier`] ( allows for composing nimbus with other consensus engines )
-pub fn build_verifier<Client, Block, CIDP>(
-	BuildVerifierParams {
-		client,
-		create_inherent_data_providers,
-		_marker,
-	}: BuildVerifierParams<Client, Block, CIDP>,
-) ->  Verifier<Client, Block, CIDP> {
-	Verifier{
-		client,
-		create_inherent_data_providers,
-		_marker,
 	}
 }
