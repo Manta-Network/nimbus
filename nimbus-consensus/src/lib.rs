@@ -320,6 +320,12 @@ where
 		relay_parent: PHash,
 		validation_data: &PersistedValidationData,
 	) -> Option<ParachainCandidate<B>> {
+        let block_id = BlockId::hash(parent.hash());
+		if !self.parachain_client.runtime_api().has_api::<dyn NimbusApi<B>>(&block_id).unwrap_or(false)
+		{
+			info!("Runtime does not have NimbusAPI, skipping block authoring");
+			return None;
+		}
 		let maybe_key = if self.skip_prediction {
 			first_available_key(&*self.keystore)
 		} else {
