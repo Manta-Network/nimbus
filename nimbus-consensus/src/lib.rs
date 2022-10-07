@@ -320,6 +320,7 @@ where
 		relay_parent: PHash,
 		validation_data: &PersistedValidationData,
 	) -> Option<ParachainCandidate<B>> {
+		trace!("Starting to produce block candidate on parent {:?} and relay parent {:?}",parent,relay_parent);
         let block_id = BlockId::hash(parent.hash());
 		if !self.parachain_client.runtime_api().has_api::<dyn NimbusApi<B>>(&block_id).unwrap_or(false)
 		{
