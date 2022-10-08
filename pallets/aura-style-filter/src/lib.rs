@@ -76,7 +76,7 @@ pub mod pallet {
 		}
 		#[cfg(feature = "runtime-benchmarks")]
 		fn get_authors(_slot: &u32) -> Vec<T::AccountId> {
-			T::PotentialAuthors::get();
+			T::PotentialAuthors::get()
 		}
 	}
 }
