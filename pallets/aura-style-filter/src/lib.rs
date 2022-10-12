@@ -78,7 +78,7 @@ pub mod pallet {
 				"AuRa-eligible author to produce block #{:?} in slot #{} is {:?}",
 				<frame_system::Pallet<T>>::block_number(),
 				slot,
-				active_author
+				*active_author
 			);
 
 			account == active_author
