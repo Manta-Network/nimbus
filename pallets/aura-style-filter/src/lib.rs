@@ -75,7 +75,7 @@ pub mod pallet {
 
 			debug!(
 				target: "filtering-consensus",
-				"AuRa-eligible author to produce block #{:?} in slot #{} is {:?}",
+				"AuRa-eligible author to produce block #{:?} in slot #{} is {}",
 				<frame_system::Pallet<T>>::block_number(),
 				slot,
 				active_author
