@@ -46,6 +46,7 @@ pub use pallet::*;
 pub mod pallet {
 
 	use frame_support::pallet_prelude::*;
+	use log::debug;
 	use sp_std::vec::Vec;
 
 	//TODO Now that the CanAuthor trait takes a slot number, I don't think this even needs to be a pallet.
@@ -71,6 +72,14 @@ pub mod pallet {
 
 			// This is the core Aura logic right here.
 			let active_author = &active[*slot as usize % active.len()];
+
+			debug!(
+				target: "filtering-consensus",
+				"AuRa-eligible author to produce block #{:?} in slot #{} is {:?}",
+				<frame_system::Pallet<T>>::block_number(),
+				slot,
+				active_author
+			);
 
 			account == active_author
 		}

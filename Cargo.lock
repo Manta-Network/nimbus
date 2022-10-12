@@ -4919,6 +4919,7 @@ version = "0.9.0"
 dependencies = [
  "frame-support",
  "frame-system",
+ "log",
  "nimbus-primitives",
  "parity-scale-codec",
  "scale-info",
