@@ -67,6 +67,14 @@ pub mod pallet {
 	// record it instorage.
 	impl<T: Config> nimbus_primitives::CanAuthor<T::AccountId> for Pallet<T> {
 		fn can_author(account: &T::AccountId, slot: &u32) -> bool {
+			// Manta-specific Bugfix: Using this pallet with RelaychainSlotBeacon can mess up the collator sequence 
+			// if no proposal is created on current slot, the relaychain will request another block 6s later,
+			// which a collator from the second half will be eligible to produce, skipping all collators in the sequence between them.
+			// To ensure this doesn't happen, enforce that noone is eligible on even relaychain block numbers, only produce on odd
+			if slot % 2 == 0 {
+				return false;
+			}
+
 			let active: Vec<T::AccountId> = T::PotentialAuthors::get();
 
 			// This is the core Aura logic right here.
