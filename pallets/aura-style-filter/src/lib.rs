@@ -67,6 +67,12 @@ pub mod pallet {
 	// record it instorage.
 	impl<T: Config> nimbus_primitives::CanAuthor<T::AccountId> for Pallet<T> {
 		fn can_author(account: &T::AccountId, slot: &u32) -> bool {
+			// Bugfix: If no proposal is created on slot-1, a collator from the second half will be eligible to fill the slot, messing up collator sequence
+			// To ensure this doesn't happen, enforce that noone is eligible on even relaychain block numbers, only produce on odd
+			if slot % 2 {
+				return false;
+			}
+
 			let active: Vec<T::AccountId> = T::PotentialAuthors::get();
 
 			// This is the core Aura logic right here.
