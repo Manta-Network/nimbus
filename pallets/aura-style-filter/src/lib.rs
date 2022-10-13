@@ -69,7 +69,7 @@ pub mod pallet {
 		fn can_author(account: &T::AccountId, slot: &u32) -> bool {
 			// Bugfix: If no proposal is created on slot-1, a collator from the second half will be eligible to fill the slot, messing up collator sequence
 			// To ensure this doesn't happen, enforce that noone is eligible on even relaychain block numbers, only produce on odd
-			if slot % 2 {
+			if slot % 2 == 0 {
 				return false;
 			}
 
