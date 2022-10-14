@@ -42,6 +42,11 @@
 use frame_support::pallet;
 pub use pallet::*;
 
+#[cfg(test)]
+mod mock;
+#[cfg(test)]
+mod tests;
+
 #[pallet]
 pub mod pallet {
 
@@ -67,11 +72,11 @@ pub mod pallet {
 	// record it instorage.
 	impl<T: Config> nimbus_primitives::CanAuthor<T::AccountId> for Pallet<T> {
 		fn can_author(account: &T::AccountId, slot: &u32) -> bool {
-			// Manta-specific Bugfix: Using this pallet with RelaychainSlotBeacon can mess up the collator sequence 
+			// Manta-specific Bugfix: Using this pallet with `RelaychainSlotBeacon` can mess up the collator sequence 
 			// if no proposal is created on current slot, the relaychain will request another block 6s later,
 			// which a collator from the second half will be eligible to produce, skipping all collators in the sequence between them.
-			// To ensure this doesn't happen, enforce that noone is eligible on even relaychain block numbers, only produce on odd
-			if slot % 2 == 0 {
+			// To ensure this doesn't happen, enforce that noone is eligible on odd relaychain block numbers, only produce on even
+			if slot % 2 != 0 {
 				return false;
 			}
 
