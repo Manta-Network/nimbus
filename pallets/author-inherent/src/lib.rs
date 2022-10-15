@@ -200,6 +200,7 @@ pub mod pallet {
 	/// can ask this pallet directly. It will do the mapping for you.
 	impl<T: Config> CanAuthor<NimbusId> for Pallet<T> {
 		fn can_author(author: &NimbusId, slot: &u32) -> bool {
+			log::warn!("TEST can_author on slot {} with author {:?}",slot,author);
 			let account = match T::AccountLookup::lookup_account(author) {
 				Some(account) => account,
 				// Authors whose account lookups fail will not be eligible
