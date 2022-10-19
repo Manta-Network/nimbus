@@ -20,8 +20,8 @@ use nimbus_primitives::CanAuthor;
 #[test]
 fn sanity_check_aura_sequence() {
 	#[rustfmt::skip]
-	let expected_sequence: Vec<Option<u64>> = vec![
-		Some(1), None, Some(3), None, Some(5), None, Some(2), None, Some(4), None, Some(1), None,
+	let expected_sequence: Vec<u64> = vec![
+		1,1,2,2,3,3,4,4,5,5,1,1,2,2
 	];
 	let mock_authors = <Test as crate::Config>::PotentialAuthors::get().clone();
 	let mut sequence = vec![];
@@ -31,8 +31,8 @@ fn sanity_check_aura_sequence() {
 			.filter(|&account| AuraStyleFilter::can_author(account, &slot))
 			.collect();
 		match eligibles.len() {
-			0 => sequence.push(None),
-			1 => sequence.push(Some(*eligibles[0])),
+			0 => panic!(), // make sure *someone* is always eligible
+			1 => sequence.push(*eligibles[0]),
 			_ => panic!(), // make sure we don't get multiple eligible authors per slot
 		}
 	}
