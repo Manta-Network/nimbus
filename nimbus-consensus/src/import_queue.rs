@@ -45,19 +45,15 @@ pub struct Verifier<Client, Block, CIDP> {
 	_marker: PhantomData<Block>,
 }
 
-impl<Client, Block, CIDP> Verifier<Client, Block, CIDP> 
-{
-/// Build a [`NimbusVerifier`] ( allows for composing nimbus with other consensus engines )
-pub fn new(
-	client: Arc<Client>,
-	create_inherent_data_providers: CIDP,
-) ->  Self {
-	Self{
-		client,
-		create_inherent_data_providers,
-		_marker : PhantomData{},
+impl<Client, Block, CIDP> Verifier<Client, Block, CIDP> {
+	/// Build a [`NimbusVerifier`] ( allows for composing nimbus with other consensus engines )
+	pub fn new(client: Arc<Client>, create_inherent_data_providers: CIDP) -> Self {
+		Self {
+			client,
+			create_inherent_data_providers,
+			_marker: PhantomData {},
+		}
 	}
-}
 }
 #[async_trait::async_trait]
 impl<Client, Block, CIDP> VerifierT<Block> for Verifier<Client, Block, CIDP>
@@ -215,10 +211,7 @@ where
 	<Client as ProvideRuntimeApi<Block>>::Api: BlockBuilderApi<Block>,
 	CIDP: CreateInherentDataProviders<Block, ()> + 'static,
 {
-	let verifier = Verifier::new(
-		client,
-		create_inherent_data_providers,
-);
+	let verifier = Verifier::new(client, create_inherent_data_providers);
 
 	Ok(BasicQueue::new(
 		verifier,
