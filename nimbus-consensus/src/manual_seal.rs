@@ -30,10 +30,10 @@ use sp_runtime::{
 	generic::{Digest, DigestItem},
 	traits::Block as BlockT,
 };
-use std::sync::Arc;
+use std::{marker::PhantomData, sync::Arc};
 
 /// Provides nimbus-compatible pre-runtime digests for use with manual seal consensus
-pub struct NimbusManualSealConsensusDataProvider<C, DP = ()> {
+pub struct NimbusManualSealConsensusDataProvider<C, DP = (), P = ()> {
 	/// Shared reference to keystore
 	pub keystore: SyncCryptoStorePtr,
 
@@ -42,17 +42,21 @@ pub struct NimbusManualSealConsensusDataProvider<C, DP = ()> {
 	// Could have a skip_prediction field here if it becomes desireable
 	/// Additional digests provider
 	pub additional_digests_provider: DP,
+
+	pub _phantom: PhantomData<P>,
 }
 
-impl<B, C, DP> ConsensusDataProvider<B> for NimbusManualSealConsensusDataProvider<C, DP>
+impl<B, C, DP, P> ConsensusDataProvider<B> for NimbusManualSealConsensusDataProvider<C, DP, P>
 where
 	B: BlockT,
 	C: ProvideRuntimeApi<B> + Send + Sync,
 	C::Api: NimbusApi<B>,
 	C::Api: AuthorFilterAPI<B, NimbusId>,
 	DP: DigestsProvider<NimbusId, <B as BlockT>::Hash> + Send + Sync,
+	P: Send + Sync,
 {
 	type Transaction = TransactionFor<C, B>;
+	type Proof = P;
 
 	fn create_digest(&self, parent: &B::Header, inherents: &InherentData) -> Result<Digest, Error> {
 		// Retrieve the relay chain block number to use as the slot number from the parachain inherent
@@ -99,6 +103,7 @@ where
 		_parent: &B::Header,
 		params: &mut BlockImportParams<B, Self::Transaction>,
 		_inherents: &InherentData,
+		_proof: Self::Proof,
 	) -> Result<(), Error> {
 		// We have to reconstruct the type-public pair which is only communicated through the pre-runtime digest
 		let claimed_author = params
