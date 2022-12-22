@@ -30,7 +30,7 @@ use nimbus_primitives::{
 };
 use parking_lot::Mutex;
 use sc_consensus::{BlockImport, BlockImportParams};
-use sp_api::{BlockId, ProvideRuntimeApi};
+use sp_api::{ApiExt, BlockId, ProvideRuntimeApi};
 use sp_application_crypto::{ByteArray, CryptoTypePublicPair};
 use sp_consensus::{
 	BlockOrigin, EnableProofRecording, Environment, ProofRecording, Proposal, Proposer,
