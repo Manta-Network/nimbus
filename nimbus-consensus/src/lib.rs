@@ -45,7 +45,7 @@ use std::convert::TryInto;
 use std::{marker::PhantomData, sync::Arc, time::Duration};
 use tracing::error;
 mod import_queue;
-pub use import_queue::{import_queue, Verifier, NimbusBlockImport};
+pub use import_queue::{import_queue, NimbusBlockImport, Verifier};
 mod manual_seal;
 pub use manual_seal::NimbusManualSealConsensusDataProvider;
 
@@ -290,7 +290,11 @@ where
 		validation_data: &PersistedValidationData,
 	) -> Option<ParachainCandidate<B>> {
 		let block_id = BlockId::hash(parent.hash());
-		if !self.parachain_client.runtime_api().has_api::<dyn NimbusApi<B>>(&block_id).unwrap_or(false)
+		if !self
+			.parachain_client
+			.runtime_api()
+			.has_api::<dyn NimbusApi<B>>(&block_id)
+			.unwrap_or(false)
 		{
 			info!("Runtime does not have NimbusAPI, skipping block authoring");
 			return None;
