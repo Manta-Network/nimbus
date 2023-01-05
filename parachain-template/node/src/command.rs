@@ -225,6 +225,7 @@ pub fn run() -> Result<()> {
 					cmd.run(config, partials.client.clone(), db, storage)
 				}),
 				BenchmarkCmd::Overhead(_) => Err("Unsupported benchmarking command".into()),
+				BenchmarkCmd::Extrinsic(_) => Err("Unsupported benchmarking command".into()),
 				BenchmarkCmd::Machine(cmd) => runner.sync_run(|config| {
 					cmd.run(
 						&config,
@@ -383,8 +384,8 @@ impl CliConfiguration<Self> for RelayChainCli {
 		self.base.base.role(is_dev)
 	}
 
-	fn transaction_pool(&self) -> Result<sc_service::config::TransactionPoolOptions> {
-		self.base.base.transaction_pool()
+	fn transaction_pool(&self, is_dev: bool) -> Result<sc_service::config::TransactionPoolOptions> {
+		self.base.base.transaction_pool(is_dev)
 	}
 
 	fn state_cache_child_ratio(&self) -> Result<Option<usize>> {
