@@ -11,3 +11,4 @@ members = [
 
 [profile.release]
 panic = "unwind"
+#ed25519-dalek = { opt-level = 3 }
