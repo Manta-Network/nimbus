@@ -45,4 +45,4 @@ runtime-benchmarks = [
 	"nimbus-primitives/runtime-benchmarks"
 ]
 
-try-runtime = [ "frame-support/try-runtime" ]
+try-runtime = [ "frame-support/try-runtime", "nimbus-primitives/try-runtime" ]
