@@ -41,7 +41,7 @@ std = [
 ]
 
 runtime-benchmarks = [
-	"frame-benchmarking",
+	"frame-benchmarkingruntime-benchmarks",
 	"nimbus-primitives/runtime-benchmarks"
 ]
 
