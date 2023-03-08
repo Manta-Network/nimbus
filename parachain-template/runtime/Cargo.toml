@@ -17,6 +17,7 @@ log = { version = "0.4.17", default-features = false }
 scale-info = { version = "2.0.0", default-features = false, features = [ "derive" ] }
 serde = { version = "1.0.119", optional = true, features = [ "derive" ] }
 smallvec = "1.6.1"
+hex-literal = { version = '0.3.4', optional = true }
 
 # Local Dependencies
 pallet-template = { path = "../pallets/template", default-features = false }
@@ -51,10 +52,14 @@ pallet-sudo = { git = "https://github.com/paritytech/substrate", branch = "polka
 pallet-timestamp = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37", default-features = false }
 pallet-transaction-payment = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37", default-features = false }
 pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37", default-features = false }
+pallet-conviction-voting = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37", default-features = false }
+pallet-ranked-collective = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37", default-features = false }
+pallet-referenda = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.37", default-features = false }
 
 # Cumulus dependencies
 cumulus-pallet-dmp-queue = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.37", default-features = false }
 cumulus-pallet-parachain-system = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.37", default-features = false }
+cumulus-pallet-session-benchmarking = { git = 'https://github.com/paritytech/cumulus.git', default-features = false, optional = true, branch = "polkadot-v0.9.37" }
 cumulus-pallet-xcm = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.37", default-features = false }
 cumulus-pallet-xcmp-queue = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.37", default-features = false }
 cumulus-primitives-core = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.37", default-features = false }
@@ -109,6 +114,9 @@ std = [
 	"pallet-timestamp/std",
 	"pallet-transaction-payment-rpc-runtime-api/std",
 	"pallet-transaction-payment/std",
+	'pallet-conviction-voting/std',
+	'pallet-ranked-collective/std',
+	'pallet-referenda/std',
 	"parachain-info/std",
 	"polkadot-parachain/std",
 	"polkadot-runtime-common/std",
@@ -131,6 +139,8 @@ std = [
 ]
 
 runtime-benchmarks = [
+  	'cumulus-pallet-session-benchmarking/runtime-benchmarks',
+	'hex-literal',
 	"frame-benchmarking/runtime-benchmarks",
 	"frame-support/runtime-benchmarks",
 	"frame-system-benchmarking/runtime-benchmarks",
@@ -140,6 +150,9 @@ runtime-benchmarks = [
 	"pallet-template/runtime-benchmarks",
 	"pallet-timestamp/runtime-benchmarks",
 	"pallet-xcm/runtime-benchmarks",
+	'pallet-conviction-voting/runtime-benchmarks',
+	'pallet-ranked-collective/runtime-benchmarks',
+	'pallet-referenda/runtime-benchmarks',
 	"sp-runtime/runtime-benchmarks",
 	"xcm-builder/runtime-benchmarks",
 ]
