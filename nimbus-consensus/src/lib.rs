@@ -24,7 +24,6 @@ use cumulus_client_consensus_common::{
 	ParachainBlockImport, ParachainCandidate, ParachainConsensus,
 };
 use cumulus_primitives_core::{relay_chain::Hash as PHash, ParaId, PersistedValidationData};
-pub use import_queue::import_queue;
 use log::{debug, info, warn};
 use nimbus_primitives::{
 	CompatibleDigestItem, DigestsProvider, NimbusApi, NimbusId, NIMBUS_KEY_ID,
@@ -32,7 +31,7 @@ use nimbus_primitives::{
 use parking_lot::Mutex;
 use sc_client_api::backend::Backend;
 use sc_consensus::{BlockImport, BlockImportParams};
-use sp_api::{BlockId, ProvideRuntimeApi};
+use sp_api::{ApiExt, BlockId, ProvideRuntimeApi};
 use sp_application_crypto::{ByteArray, CryptoTypePublicPair};
 use sp_consensus::{
 	BlockOrigin, EnableProofRecording, Environment, ProofRecording, Proposal, Proposer,
