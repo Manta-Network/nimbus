@@ -71,6 +71,7 @@ pub mod pallet {
 	// of this block is eligible at this slot. We calculate that result on demand and do not
 	// record it instorage.
 	impl<T: Config> nimbus_primitives::CanAuthor<T::AccountId> for Pallet<T> {
+		#[cfg(not(feature = "try-runtime"))]
 		fn can_author(account: &T::AccountId, slot: &u32) -> bool {
 			// Manta-specific Bugfix: Ensure the same author is eligible for two consecutive 6s (=relaychain block time) slots
 			// Otherwise using this pallet with `RelaychainBlockNumberProvider` as `SlotBeacon` can mess up the collator sequence
