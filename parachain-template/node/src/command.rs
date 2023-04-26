@@ -216,15 +216,25 @@ pub fn run() -> Result<()> {
 						new_partial::<RuntimeApi, TemplateRuntimeExecutor>(&config, false)?;
 					cmd.run(partials.client)
 				}),
+				#[cfg(not(feature = "runtime-benchmarks"))]
+				BenchmarkCmd::Storage(_) => {
+					return Err(sc_cli::Error::Input(
+						"Compile with --features=runtime-benchmarks \
+						to enable storage benchmarks."
+							.into(),
+					)
+					.into())
+				}
+				#[cfg(feature = "runtime-benchmarks")]
 				BenchmarkCmd::Storage(cmd) => runner.sync_run(|config| {
-					let partials =
-						new_partial::<RuntimeApi, TemplateRuntimeExecutor>(&config, false)?;
+					let partials = new_partial::<RuntimeApi, TemplateRuntimeExecutor>(&config, false)?;
 					let db = partials.backend.expose_db();
 					let storage = partials.backend.expose_storage();
 
 					cmd.run(config, partials.client.clone(), db, storage)
 				}),
 				BenchmarkCmd::Overhead(_) => Err("Unsupported benchmarking command".into()),
+				BenchmarkCmd::Extrinsic(_) => Err("Unsupported benchmarking command".into()),
 				BenchmarkCmd::Machine(cmd) => runner.sync_run(|config| {
 					cmd.run(
 						&config,
@@ -258,7 +268,9 @@ pub fn run() -> Result<()> {
 				let id = ParaId::from(para_id);
 
 				let parachain_account =
-				AccountIdConversion::<polkadot_primitives::v2::AccountId>::into_account_truncating(&id);
+					AccountIdConversion::<parachain_template_runtime::AccountId>::into_account_truncating(
+						&id,
+					);
 
 				let state_version =
 					RelayChainCli::native_runtime_version(&config.chain_spec).state_version();
@@ -330,7 +342,7 @@ impl CliConfiguration<Self> for RelayChainCli {
 	fn base_path(&self) -> Result<Option<BasePath>> {
 		Ok(self
 			.shared_params()
-			.base_path()
+			.base_path()?
 			.or_else(|| self.base_path.clone().map(Into::into)))
 	}
 
@@ -383,12 +395,8 @@ impl CliConfiguration<Self> for RelayChainCli {
 		self.base.base.role(is_dev)
 	}
 
-	fn transaction_pool(&self) -> Result<sc_service::config::TransactionPoolOptions> {
-		self.base.base.transaction_pool()
-	}
-
-	fn state_cache_child_ratio(&self) -> Result<Option<usize>> {
-		self.base.base.state_cache_child_ratio()
+	fn transaction_pool(&self, is_dev: bool) -> Result<sc_service::config::TransactionPoolOptions> {
+		self.base.base.transaction_pool(is_dev)
 	}
 
 	fn rpc_methods(&self) -> Result<sc_service::config::RpcMethods> {
