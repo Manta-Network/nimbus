@@ -3297,6 +3297,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ebdb29d2ea9ed0083cd8cece49bbd968021bd99b0849edb4a9a7ee0fdf6a4e0"
 
 [[package]]
+name = "hex-literal"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
+
+[[package]]
 name = "hkdf"
 version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6025,6 +6031,7 @@ name = "pallet-referenda"
 version = "4.0.0-dev"
 source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.37#6fa7fe1326ecaab9921c2c3888530ad679cfbb87"
 dependencies = [
+ "assert_matches",
  "frame-benchmarking",
  "frame-support",
  "frame-system",
@@ -6355,7 +6362,7 @@ dependencies = [
  "flume",
  "frame-benchmarking",
  "frame-benchmarking-cli",
- "hex-literal",
+ "hex-literal 0.3.4",
  "jsonrpsee",
  "log",
  "nimbus-consensus",
@@ -6420,13 +6427,17 @@ dependencies = [
  "frame-system",
  "frame-system-benchmarking",
  "frame-system-rpc-runtime-api",
+ "hex-literal 0.4.1",
  "log",
  "nimbus-primitives",
  "pallet-author-inherent",
  "pallet-author-slot-filter",
  "pallet-balances",
  "pallet-collator-selection",
+ "pallet-conviction-voting",
  "pallet-randomness-collective-flip",
+ "pallet-ranked-collective",
+ "pallet-referenda",
  "pallet-session",
  "pallet-sudo",
  "pallet-template",
@@ -7481,7 +7492,7 @@ version = "0.9.37"
 source = "git+https://github.com/paritytech/polkadot?branch=release-v0.9.37#645723987cf9662244be8faf4e9b63e8b9a1b3a3"
 dependencies = [
  "bitvec",
- "hex-literal",
+ "hex-literal 0.3.4",
  "parity-scale-codec",
  "polkadot-core-primitives",
  "polkadot-parachain",
@@ -7737,7 +7748,7 @@ dependencies = [
  "frame-support",
  "frame-system-rpc-runtime-api",
  "futures 0.3.28",
- "hex-literal",
+ "hex-literal 0.3.4",
  "kvdb",
  "kvdb-rocksdb",
  "lru",
