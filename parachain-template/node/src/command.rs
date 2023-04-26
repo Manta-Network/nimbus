@@ -268,7 +268,7 @@ pub fn run() -> Result<()> {
 				let id = ParaId::from(para_id);
 
 				let parachain_account =
-					AccountIdConversion::<polkadot_primitives::AccountId>::into_account_truncating(
+					AccountIdConversion::<parachain_template_runtime::AccountId>::into_account_truncating(
 						&id,
 					);
 
