@@ -75,7 +75,7 @@ impl<T> EventHandler<T> for () {
 pub trait SlotBeacon {
 	fn slot() -> u32;
 	#[cfg(feature = "runtime-benchmarks")]
-	fn set_slot(_slot: u32) {}
+	fn set_slot(_slot: u32);
 }
 
 /// Anything that can provide a block height can be used as a slot beacon. This could be
@@ -101,6 +101,10 @@ impl SlotBeacon for IntervalBeacon {
 	fn slot() -> u32 {
 		todo!()
 	}
+	#[cfg(feature = "runtime-benchmarks")]
+	fn set_slot(slot:u32){
+		todo!();
+	}
 }
 
 /// Trait to determine whether this author is eligible to author in this slot.
@@ -121,11 +125,9 @@ pub trait CanAuthor<AuthorId> {
 	#[cfg(not(feature = "try-runtime"))]
 	fn can_author(author: &AuthorId, slot: &u32) -> bool;
 	#[cfg(feature = "runtime-benchmarks")]
-	fn get_authors(_slot: &u32) -> Vec<AuthorId> {
-		vec![]
-	}
+	fn get_authors(_slot: &u32) -> Vec<AuthorId>;
 	#[cfg(feature = "runtime-benchmarks")]
-	fn set_eligible_author(_slot: &u32) {}
+	fn set_eligible_author(_slot: &u32);
 }
 /// Default implementation where anyone can author.
 ///
