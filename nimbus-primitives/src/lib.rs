@@ -75,7 +75,7 @@ impl<T> EventHandler<T> for () {
 pub trait SlotBeacon {
 	fn slot() -> u32;
 	#[cfg(feature = "runtime-benchmarks")]
-	fn set_slot(_slot: u32) {}
+	fn set_slot(_slot: u32);
 }
 
 /// Anything that can provide a block height can be used as a slot beacon. This could be
@@ -100,6 +100,10 @@ pub struct IntervalBeacon;
 impl SlotBeacon for IntervalBeacon {
 	fn slot() -> u32 {
 		todo!()
+	}
+	#[cfg(feature = "runtime-benchmarks")]
+	fn set_slot(slot:u32){
+		todo!();
 	}
 }
 
