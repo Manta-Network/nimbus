@@ -50,3 +50,6 @@ runtime-benchmarks = [
 	"frame-benchmarking",
 	"nimbus-primitives/runtime-benchmarks",
 ]
+
+# implement for trait bound completeness for the users
+try-runtime = []
