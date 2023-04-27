@@ -5426,6 +5426,7 @@ dependencies = [
  "scale-info",
  "sp-api",
  "sp-application-crypto",
+ "sp-authorship",
  "sp-core",
  "sp-inherents",
  "sp-io",
