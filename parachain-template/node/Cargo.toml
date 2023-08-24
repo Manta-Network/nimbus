@@ -21,6 +21,7 @@ clap = { version = "4.0.9", features = [ "derive" ] }
 codec = { package = "parity-scale-codec", version = "3.0.0" }
 derive_more = "0.99.2"
 flume = "0.10.9"
+futures = { version = "0.3.21", features = ["thread-pool"]}
 hex-literal = "0.3.1"
 log = "0.4.17"
 serde = { version = "1.0.119", features = [ "derive" ] }
@@ -55,6 +56,7 @@ sc-keystore = { git = "https://github.com/paritytech/substrate", branch = "polka
 sc-network = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
 sc-network-sync = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
 sc-network-common = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
+sc-offchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
 sc-rpc = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
 sc-rpc-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
 sc-service = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
@@ -69,6 +71,7 @@ sp-block-builder = { git = "https://github.com/paritytech/substrate", branch = "
 sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
 #sp-consensus = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.26" }
 sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
+sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
 sp-inherents = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
 sp-keystore = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
 sp-offchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }

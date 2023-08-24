@@ -1,8 +1,8 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 
 // std
+use futures::FutureExt;
 use std::{sync::Arc, time::Duration};
-
 // Local Runtime Types
 use parachain_template_runtime::{opaque::Block, AccountId, Balance, Index as Nonce, RuntimeApi};
 
@@ -13,7 +13,7 @@ use nimbus_consensus::{
 // Cumulus Imports
 use cumulus_client_cli::CollatorOptions;
 use cumulus_client_consensus_common::ParachainConsensus;
-use cumulus_client_network::BlockAnnounceValidator;
+use cumulus_client_network::RequireSecondedInBlockAnnounce;
 use cumulus_client_service::{
 	prepare_node_config, start_collator, start_full_node, StartCollatorParams, StartFullNodeParams,
 };
@@ -28,6 +28,7 @@ use cumulus_relay_chain_minimal_node::build_minimal_relay_chain_node;
 use polkadot_service::CollatorPair;
 
 // Substrate Imports
+use sc_client_api::Backend;
 use sc_consensus::ImportQueue;
 use sc_consensus_manual_seal::{run_instant_seal, InstantSealParams};
 use sc_executor::{
@@ -62,29 +63,31 @@ impl sc_executor::NativeExecutionDispatch for TemplateRuntimeExecutor {
 /// Use this macro if you don't actually need the full service, but just the builder in order to
 /// be able to perform chain operations.
 #[allow(clippy::type_complexity)]
-pub fn new_partial<RuntimeApi, Executor>(
+pub fn new_partial<RuntimeApi>(
 	config: &Configuration,
 	parachain: bool,
 ) -> Result<
 	PartialComponents<
-		TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>,
+		TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<TemplateRuntimeExecutor>>,
 		TFullBackend<Block>,
 		sc_consensus::LongestChain<TFullBackend<Block>, Block>,
 		sc_consensus::DefaultImportQueue<
 			Block,
-			TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>,
+			TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<TemplateRuntimeExecutor>>,
 		>,
 		sc_transaction_pool::FullPool<
 			Block,
-			TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>,
+			TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<TemplateRuntimeExecutor>>,
 		>,
 		(Option<Telemetry>, Option<TelemetryWorkerHandle>),
 	>,
 	sc_service::Error,
 >
 where
-	RuntimeApi: ConstructRuntimeApi<Block, TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>>
-		+ Send
+	RuntimeApi: ConstructRuntimeApi<
+			Block,
+			TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<TemplateRuntimeExecutor>>,
+		> + Send
 		+ Sync
 		+ 'static,
 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>
@@ -96,7 +99,6 @@ where
 		> + sp_offchain::OffchainWorkerApi<Block>
 		+ sp_block_builder::BlockBuilder<Block>,
 	sc_client_api::StateBackendFor<TFullBackend<Block>, Block>: sp_api::StateBackend<BlakeTwo256>,
-	Executor: sc_executor::NativeExecutionDispatch + 'static,
 {
 	let telemetry = config
 		.telemetry_endpoints
@@ -123,7 +125,7 @@ where
 		.with_runtime_cache_size(config.runtime_cache_size)
 		.build();
 
-	let executor = sc_executor::NativeElseWasmExecutor::<Executor>::new_with_wasm_executor(wasm);
+	let executor = NativeElseWasmExecutor::<TemplateRuntimeExecutor>::new_with_wasm_executor(wasm);
 
 	let (client, backend, keystore_container, task_manager) =
 		sc_service::new_full_parts::<Block, RuntimeApi, _>(
@@ -213,7 +215,7 @@ async fn build_relay_chain_interface(
 ///
 /// This is the actual implementation that is abstract over the executor and the runtime api.
 #[sc_tracing::logging::prefix_logs_with("Parachain")]
-async fn start_node_impl<RuntimeApi, Executor, RB, BIC>(
+async fn start_node_impl<RuntimeApi, RB, BIC>(
 	parachain_config: Configuration,
 	polkadot_config: Configuration,
 	collator_options: CollatorOptions,
@@ -222,11 +224,13 @@ async fn start_node_impl<RuntimeApi, Executor, RB, BIC>(
 	build_consensus: BIC,
 ) -> sc_service::error::Result<(
 	TaskManager,
-	Arc<TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>>,
+	Arc<TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<TemplateRuntimeExecutor>>>,
 )>
 where
-	RuntimeApi: ConstructRuntimeApi<Block, TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>>
-		+ Send
+	RuntimeApi: ConstructRuntimeApi<
+			Block,
+			TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<TemplateRuntimeExecutor>>,
+		> + Send
 		+ Sync
 		+ 'static,
 	RuntimeApi::RuntimeApi: sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>
@@ -241,14 +245,14 @@ where
 		+ pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>
 		+ substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Nonce>,
 	sc_client_api::StateBackendFor<TFullBackend<Block>, Block>: sp_api::StateBackend<BlakeTwo256>,
-	Executor: sc_executor::NativeExecutionDispatch + 'static,
+	// Executor: sc_executor::NativeExecutionDispatch + 'static,
 	RB: Fn(
-			Arc<TFullClient<Block, RuntimeApi, Executor>>,
+			Arc<TFullClient<Block, RuntimeApi, TemplateRuntimeExecutor>>,
 		) -> Result<crate::rpc::RpcExtension, sc_service::Error>
 		+ Send
 		+ 'static,
 	BIC: FnOnce(
-		Arc<TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>>,
+		Arc<TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<TemplateRuntimeExecutor>>>,
 		Arc<sc_client_db::Backend<Block>>,
 		Option<&Registry>,
 		Option<TelemetryHandle>,
@@ -257,7 +261,7 @@ where
 		Arc<
 			sc_transaction_pool::FullPool<
 				Block,
-				TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>,
+				TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<TemplateRuntimeExecutor>>,
 			>,
 		>,
 		Arc<SyncingService<Block>>,
@@ -267,7 +271,7 @@ where
 {
 	let parachain_config = prepare_node_config(parachain_config);
 
-	let params = new_partial::<RuntimeApi, Executor>(&parachain_config, true)?;
+	let params = new_partial::<RuntimeApi>(&parachain_config, true)?;
 	let (mut telemetry, telemetry_worker_handle) = params.other;
 
 	let client = params.client.clone();
@@ -284,7 +288,8 @@ where
 	.await
 	.map_err(|e| sc_service::Error::Application(Box::new(e) as Box<_>))?;
 
-	let block_announce_validator = BlockAnnounceValidator::new(relay_chain_interface.clone(), id);
+	let block_announce_validator =
+		RequireSecondedInBlockAnnounce::new(relay_chain_interface.clone(), id);
 
 	let force_authoring = parachain_config.force_authoring;
 	let validator = parachain_config.role.is_authority();
@@ -412,7 +417,7 @@ pub async fn start_parachain_node(
 	TaskManager,
 	Arc<TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<TemplateRuntimeExecutor>>>,
 )> {
-	start_node_impl::<RuntimeApi, TemplateRuntimeExecutor, _, _>(
+	start_node_impl::<RuntimeApi, _, _>(
 		parachain_config,
 		polkadot_config,
 		collator_options,
@@ -491,7 +496,7 @@ pub fn start_instant_seal_node(config: Configuration) -> Result<TaskManager, sc_
 		select_chain,
 		transaction_pool,
 		other: (mut telemetry, _),
-	} = new_partial::<RuntimeApi, TemplateRuntimeExecutor>(&config, false)?;
+	} = new_partial::<RuntimeApi>(&config, false)?;
 
 	let net_config = FullNetworkConfiguration::new(&config.network);
 
@@ -508,11 +513,25 @@ pub fn start_instant_seal_node(config: Configuration) -> Result<TaskManager, sc_
 		})?;
 
 	if config.offchain_worker.enabled {
-		sc_service::build_offchain_workers(
-			&config,
-			task_manager.spawn_handle(),
-			client.clone(),
-			network.clone(),
+		task_manager.spawn_handle().spawn(
+			"offchain-workers-runner",
+			"offchain-worker",
+			sc_offchain::OffchainWorkers::new(sc_offchain::OffchainWorkerOptions {
+				runtime_api_provider: client.clone(),
+				is_validator: config.role.is_authority(),
+				keystore: Some(keystore_container.keystore()),
+				offchain_db: backend.offchain_storage(),
+				transaction_pool: Some(
+					sc_transaction_pool_api::OffchainTransactionPoolFactory::new(
+						transaction_pool.clone(),
+					),
+				),
+				network_provider: network.clone(),
+				enable_http_requests: true,
+				custom_extensions: |_| vec![],
+			})
+			.run(client.clone(), task_manager.spawn_handle())
+			.boxed(),
 		);
 	}
 

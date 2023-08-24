@@ -47,7 +47,10 @@ pub mod pallet {
 
 	use crate::num::NonZeroU32;
 	use crate::weights::WeightInfo;
-	use frame_support::{pallet_prelude::*, traits::{BuildGenesisConfig, Randomness}};
+	use frame_support::{
+		pallet_prelude::*,
+		traits::{BuildGenesisConfig, Randomness},
+	};
 	use frame_system::pallet_prelude::*;
 	use log::debug;
 	use nimbus_primitives::CanAuthor;
@@ -202,19 +205,12 @@ pub mod pallet {
 	}
 
 	#[pallet::genesis_config]
+	#[derive(frame_support::DefaultNoBound)]
 	pub struct GenesisConfig<T: Config> {
+		#[serde(skip)]
 		pub eligible_count: EligibilityValue,
-		_ghost: PhantomData<T>,
-	}
-
-	#[cfg(feature = "std")]
-	impl<T: Config> Default for GenesisConfig<T> {
-		fn default() -> Self {
-			Self {
-				eligible_count: EligibilityValue::default(),
-				_ghost: PhantomData,
-			}
-		}
+		#[serde(skip)]
+		pub _ghost: PhantomData<T>,
 	}
 
 	#[pallet::genesis_build]

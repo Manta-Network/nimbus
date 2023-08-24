@@ -22,7 +22,7 @@ use scale_info::TypeInfo;
 use serde::de::Error as DeserializeError;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(Clone, Debug, TypeInfo, Encode, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Debug, Default, TypeInfo, Encode, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct NonZeroU32(u32);
 
 impl core::ops::Deref for NonZeroU32 {
