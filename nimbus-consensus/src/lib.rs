@@ -24,7 +24,6 @@ use cumulus_client_consensus_common::{
 	ParachainBlockImport, ParachainCandidate, ParachainConsensus,
 };
 use cumulus_primitives_core::{relay_chain::Hash as PHash, ParaId, PersistedValidationData};
-pub use import_queue::import_queue;
 use log::{debug, info, warn};
 use nimbus_primitives::{
 	CompatibleDigestItem, DigestsProvider, NimbusApi, NimbusId, NIMBUS_KEY_ID,
