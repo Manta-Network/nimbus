@@ -48,6 +48,7 @@ use std::convert::TryInto;
 use std::{marker::PhantomData, sync::Arc, time::Duration};
 use tracing::error;
 mod import_queue;
+pub use import_queue::{import_queue, NimbusBlockImport, Verifier};
 mod manual_seal;
 pub use manual_seal::NimbusManualSealConsensusDataProvider;
 
