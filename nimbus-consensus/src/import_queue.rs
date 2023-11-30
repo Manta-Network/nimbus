@@ -39,9 +39,9 @@ use sp_runtime::{
 /// is valid. The intention is that the runtime itself may then put further restrictions on
 /// the identity of the author.
 pub struct Verifier<Client, Block, CIDP> {
-	client: Arc<Client>,
-	create_inherent_data_providers: CIDP,
-	_marker: PhantomData<Block>,
+	pub client: Arc<Client>,
+	pub create_inherent_data_providers: CIDP,
+	pub _marker: PhantomData<Block>,
 }
 
 #[async_trait::async_trait]
