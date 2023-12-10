@@ -18,6 +18,9 @@ sp-std = { git = "https://github.com/paritytech/substrate", default-features = f
 
 [features]
 default = [ "std" ]
+runtime-benchmarks = [
+	"nimbus-primitives/runtime-benchmarks"
+]
 std = [
 	"frame-support/std",
 	"frame-system/std",
