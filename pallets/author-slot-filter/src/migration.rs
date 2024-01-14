@@ -18,15 +18,20 @@ use core::marker::PhantomData;
 use frame_support::traits::Get;
 use frame_support::traits::OnRuntimeUpgrade;
 use frame_support::weights::Weight;
-use parity_scale_codec::{Decode, Encode};
 use sp_runtime::Percent;
-use sp_std::vec::Vec;
 
 use super::num::NonZeroU32;
 use super::pallet::Config;
 use super::pallet::EligibilityValue;
 use super::pallet::EligibleCount;
 use super::pallet::Pallet;
+
+#[cfg(feature = "try-runtime")]
+use {
+	parity_scale_codec::{Decode, Encode},
+	sp_std::vec::Vec,
+};
+
 pub struct EligibleRatioToEligiblityCount<T>(PhantomData<T>);
 
 impl<T> OnRuntimeUpgrade for EligibleRatioToEligiblityCount<T>
@@ -46,7 +51,7 @@ where
 	}
 
 	#[cfg(feature = "try-runtime")]
-	fn pre_upgrade() -> Result<Vec<u8>, &'static str> {
+	fn pre_upgrade() -> Result<Vec<u8>, sp_runtime::DispatchError> {
 		let old_value = <Pallet<T>>::eligible_ratio();
 
 		let total_authors = <T as Config>::PotentialAuthors::get().len();
@@ -57,7 +62,7 @@ where
 	}
 
 	#[cfg(feature = "try-runtime")]
-	fn post_upgrade(state: Vec<u8>) -> Result<(), &'static str> {
+	fn post_upgrade(state: Vec<u8>) -> Result<(), sp_runtime::DispatchError> {
 		let expected: NonZeroU32 =
 			Decode::decode(&mut &state[..]).expect("pre_upgrade provides a valid state; qed");
 

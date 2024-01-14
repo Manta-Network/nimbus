@@ -26,10 +26,9 @@ use sp_api::ProvideRuntimeApi;
 use sp_application_crypto::{ByteArray, Pair as _};
 use sp_block_builder::BlockBuilder as BlockBuilderApi;
 use sp_blockchain::Result as ClientResult;
-use sp_consensus::{error::Error as ConsensusError, CacheKeyId};
+use sp_consensus::error::Error as ConsensusError;
 use sp_inherents::{CreateInherentDataProviders, InherentDataProvider};
 use sp_runtime::{
-	generic::BlockId,
 	traits::{Block as BlockT, Header as HeaderT},
 	DigestItem,
 };
@@ -66,13 +65,21 @@ where
 	async fn verify(
 		&mut self,
 		mut block_params: BlockImportParams<Block, ()>,
-	) -> Result<
-		(
-			BlockImportParams<Block, ()>,
-			Option<Vec<(CacheKeyId, Vec<u8>)>>,
-		),
-		String,
-	> {
+	) -> Result<BlockImportParams<Block, ()>, String> {
+		// Skip checks that include execution, if being told so or when importing only state.
+		//
+		// This is done for example when gap syncing and it is expected that the block after the gap
+		// was checked/chosen properly, e.g. by warp syncing to this block using a finality proof.
+		// Or when we are importing state only and can not verify the seal.
+		if block_params.with_state() || block_params.state_action.skip_execution_checks() {
+			// When we are importing only the state of a block, it will be the best block.
+			block_params.fork_choice = Some(sc_consensus::ForkChoiceStrategy::Custom(
+				block_params.with_state(),
+			));
+
+			return Ok(block_params);
+		}
+
 		debug!(
 			target: crate::LOG_TARGET,
 			"🪲 Header hash before popping digest {:?}",
@@ -83,7 +90,7 @@ where
 			.header
 			.digest_mut()
 			.pop()
-			.expect("Block should have at least one digest on it");
+			.ok_or("Block should have at least one digest on it")?;
 
 		let signature = seal
 			.as_nimbus_seal()
@@ -116,7 +123,7 @@ where
 				}
 				_ => None,
 			})
-			.expect("Expected one consensus or pre-runtime digest that contains author id bytes");
+			.ok_or("Expected one consensus or pre-runtime digest that contains author id bytes")?;
 
 		debug!(
 			target: crate::LOG_TARGET,
@@ -159,7 +166,7 @@ where
 				.client
 				.runtime_api()
 				.check_inherents(
-					&BlockId::Hash(*block_params.header.parent_hash()),
+					*block_params.header.parent_hash(),
 					block.clone(),
 					inherent_data,
 				)
@@ -192,7 +199,7 @@ where
 			&block_params.post_hash()
 		);
 
-		Ok((block_params, None))
+		Ok(block_params)
 	}
 }
 
@@ -266,7 +273,6 @@ where
 	async fn import_block(
 		&mut self,
 		mut block_import_params: sc_consensus::BlockImportParams<Block, Self::Transaction>,
-		cache: std::collections::HashMap<sp_consensus::CacheKeyId, Vec<u8>>,
 	) -> Result<sc_consensus::ImportResult, Self::Error> {
 		// If we are in the parachain context, best block is determined by the relay chain
 		// except during initial sync
@@ -277,6 +283,6 @@ where
 		}
 
 		// Now continue on to the rest of the import pipeline.
-		self.inner.import_block(block_import_params, cache).await
+		self.inner.import_block(block_import_params).await
 	}
 }
