@@ -15,14 +15,12 @@
 // along with Nimbus.  If not, see <http://www.gnu.org/licenses/>.
 
 pub use crate::{self as pallet_testing};
-use frame_support::{parameter_types, derive_impl};
 use frame_support::traits::ConstU32;
 use frame_support::weights::RuntimeDbWeight;
+use frame_support::{derive_impl, parameter_types};
 use frame_system;
 use sp_core::H256;
-use sp_runtime::{
-	traits::{BlakeTwo256, IdentityLookup},
-};
+use sp_runtime::traits::{BlakeTwo256, IdentityLookup};
 
 type Block = frame_system::mocking::MockBlock<Test>;
 
