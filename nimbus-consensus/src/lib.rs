@@ -287,7 +287,6 @@ where
 	PF: Environment<B> + Send + Sync + 'static,
 	PF::Proposer: Proposer<
 		B,
-		Transaction = BI::Transaction,
 		ProofRecording = EnableProofRecording,
 		Proof = <EnableProofRecording as ProofRecording>::Proof,
 	>,
@@ -305,12 +304,12 @@ where
 		// Determine if runtime change
 		let runtime_upgraded = if *parent.number() > sp_runtime::traits::Zero::zero() {
 			use sp_api::Core as _;
-			let previous_runtime_version: sp_api::RuntimeVersion = self
+			let previous_runtime_version: sp_version::RuntimeVersion = self
 				.parachain_client
 				.runtime_api()
 				.version(parent.hash())
 				.ok()?;
-			let runtime_version: sp_api::RuntimeVersion = self
+			let runtime_version: sp_version::RuntimeVersion = self
 				.parachain_client
 				.runtime_api()
 				.version(parent.hash())

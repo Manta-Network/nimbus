@@ -15,27 +15,22 @@
 // along with Nimbus.  If not, see <http://www.gnu.org/licenses/>.
 
 pub use crate::{self as pallet_testing};
-use frame_support::parameter_types;
+use frame_support::{parameter_types, derive_impl};
 use frame_support::traits::ConstU32;
 use frame_support::weights::RuntimeDbWeight;
 use frame_system;
 use sp_core::H256;
 use sp_runtime::{
-	testing::Header,
 	traits::{BlakeTwo256, IdentityLookup},
 };
 
-type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 
 frame_support::construct_runtime!(
-	pub enum Test where
-		Block = Block,
-		NodeBlock = Block,
-		UncheckedExtrinsic = UncheckedExtrinsic,
+	pub enum Test
 	{
-		System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
-		AuraStyleFilter: pallet_testing::{Pallet},
+		System: frame_system,
+		AuraStyleFilter: pallet_testing,
 	}
 );
 
@@ -48,6 +43,7 @@ parameter_types! {
 	};
 }
 
+#[derive_impl(frame_system::config_preludes::TestDefaultConfig as frame_system::DefaultConfig)]
 impl frame_system::Config for Test {
 	type BaseCallFilter = frame_support::traits::Everything;
 	type BlockWeights = ();
@@ -55,13 +51,12 @@ impl frame_system::Config for Test {
 	type DbWeight = TestDbWeight;
 	type RuntimeCall = RuntimeCall;
 	type RuntimeOrigin = RuntimeOrigin;
-	type Index = u64;
-	type BlockNumber = u64;
+	type Block = Block;
+	type Nonce = u64;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
-	type Header = Header;
 	type RuntimeEvent = RuntimeEvent;
 	type BlockHashCount = BlockHashCount;
 	type Version = ();

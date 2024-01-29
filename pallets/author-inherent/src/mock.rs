@@ -15,27 +15,23 @@
 // along with Nimbus.  If not, see <http://www.gnu.org/licenses/>.
 
 use crate::{self as pallet_testing, AccountLookup, NimbusId};
-use frame_support::parameter_types;
+use frame_support::{parameter_types, derive_impl};
 use frame_support::traits::ConstU32;
 use frame_support::weights::RuntimeDbWeight;
 use frame_system;
 use sp_core::H256;
 use sp_runtime::{
-	testing::Header,
+	BuildStorage,
 	traits::{BlakeTwo256, IdentityLookup},
 };
 
-type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 
 frame_support::construct_runtime!(
-	pub enum Test where
-		Block = Block,
-		NodeBlock = Block,
-		UncheckedExtrinsic = UncheckedExtrinsic,
+	pub enum Test
 	{
-		System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
-		AuthorInherent: pallet_testing::{Pallet, Call, Storage},
+		System: frame_system,
+		AuthorInherent: pallet_testing,
 	}
 );
 
@@ -48,6 +44,7 @@ parameter_types! {
 	};
 }
 
+#[derive_impl(frame_system::config_preludes::TestDefaultConfig as frame_system::DefaultConfig)]
 impl frame_system::Config for Test {
 	type BaseCallFilter = frame_support::traits::Everything;
 	type BlockWeights = ();
@@ -55,13 +52,12 @@ impl frame_system::Config for Test {
 	type DbWeight = TestDbWeight;
 	type RuntimeOrigin = RuntimeOrigin;
 	type RuntimeCall = RuntimeCall;
-	type Index = u64;
-	type BlockNumber = u64;
+	type Block = Block;
+	type Nonce = u64;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
-	type Header = Header;
 	type RuntimeEvent = RuntimeEvent;
 	type BlockHashCount = BlockHashCount;
 	type Version = ();
@@ -107,8 +103,8 @@ impl pallet_testing::Config for Test {
 
 /// Build genesis storage according to the mock runtime.
 pub fn new_test_ext() -> sp_io::TestExternalities {
-	frame_system::GenesisConfig::default()
-		.build_storage::<Test>()
+	frame_system::GenesisConfig::<Test>::default()
+		.build_storage()
 		.unwrap()
 		.into()
 }
